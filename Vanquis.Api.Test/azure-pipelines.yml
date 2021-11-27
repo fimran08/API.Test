@@ -1,0 +1,68 @@
+trigger:
+- master
+
+variables:
+  Major: 1
+  Minor: 0
+
+name: $(Major).$(Minor)$(Rev:.r)
+
+stages:
+  - stage: Build
+    pool:
+      vmImage: 'windows-2019'
+
+    variables:
+      buildConfiguration: 'Release'
+      name: PackageVersion
+      value: '$(build.buildNumber)'
+
+    jobs: 
+      - job: Build
+        steps:
+        - task: DotNetCoreCLI@2
+          displayName: Restore
+          inputs:
+            command: restore
+            projects: '**/Vanquis.Api.Test.sln'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Build solution Vanquis.Api.Test.sln'
+          inputs:
+            command: build
+            projects: '**/Vanquis.Api.Test.sln'
+            arguments: '--configuration $(BuildConfiguration)'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Package Vanquis.Api.Test.sln'
+          inputs:
+            command: pack
+            versioningScheme: byBuildNumber
+            arguments: --output $(Build.ArtifactStagingDirectory)
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact'
+          inputs:
+            PathtoPublish: $(Build.ArtifactStagingDirectory)
+            ArtifactName: Vanquis.Api.Test
+          condition: succeededOrFailed()
+ 
+  - stage: Release
+    pool:
+      vmImage: 'windows-2019'
+    variables:
+      buildConfiguration: 'Release'
+    jobs:
+    - deployment: Release
+      environment: Release
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: DotNetCoreCLI@2
+              displayName: 'Push Nuget To Feed'
+              inputs:
+                command: 'push'
+                packagesToPush: $(Agent.BuildDirectory)/**/Vanquis.Api.Test*.nupkg
+                nuGetFeedType: 'internal'
+                publishVstsFeed: 'cd4e72a4-faf5-4835-b2a7-7d97d2f32be4'

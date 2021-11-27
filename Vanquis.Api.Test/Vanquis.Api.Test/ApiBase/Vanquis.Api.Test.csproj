@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>Vanquis.Api.Test</AssemblyName>
+    <RootNamespace>Vanquis.Api.Test</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>Rohan Nzenwa Jasons</Authors>
+    <Company>Vanquis</Company>
+    <Description>Lightweight API automation framework. Wrapper around the RestSharp library to be used as an acceleration tool for API testing</Description>
+    <Version>1.0.49</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="RestSharp" Version="106.10.1" />
+  </ItemGroup>
+
+</Project>
